@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIFA Ultimate Team Manager</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="team-logo" id="teamLogo">⚽</div>
+            <div class="team-info">
+                <h1 id="teamName">MI EQUIPO</h1>
+                <div class="team-stats">
+                    <div class="stat-item"><span>⭐</span><span id="teamRating">0</span></div>
+                    <div class="stat-item"><span>👥</span><span id="teamChemistry">10</span></div>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-secondary" onclick="abrirModalEquipo()">✏️ EDITAR EQUIPO</button>
+    </div>
+
+    <!-- Navbar reducida a 3 tabs principales -->
+    <div class="tabs" id="tabs">
+        <div class="tab active" data-section="campo">⚽ 6 INICIAL</div>
+        <div class="tab" data-section="jugadores">👥 JUGADORES</div>
+        <div class="tab" data-section="estadisticas">📊 ESTADÍSTICAS</div>
+    </div>
+
+    <!-- Layout mejorado: campo + suplentes en la misma vista sin sidebar -->
+    <div class="main-campo" id="campo">
+        <!-- Añadido sidebar izquierdo para suplentes con toggle -->
+        <button class="sidebar-toggle left" id="toggleLeftSidebar" onclick="toggleSidebar('left')">
+            <span class="toggle-icon">◀</span>
+        </button>
+
+        <aside class="sidebar left-sidebar" id="leftSidebar">
+            <div class="sidebar-header">
+                <h2>🔄 SUPLENTES</h2>
+                <button class="close-sidebar" onclick="toggleSidebar('left')">✕</button>
+            </div>
+            <div class="suplentes-grid" id="suplentes"></div>
+        </aside>
+
+        <div class="campo-container">
+            <!-- Campo optimizado para 6 jugadores -->
+            <section class="campo">
+                <div class="campo-lines">
+                    <div class="penalty-area top"></div>
+                    <div class="penalty-area bottom"></div>
+                    <div class="center-circle"></div>
+                    <div class="center-dot"></div>
+                </div>
+                <div class="campo-jugadores" id="campoJugadores">
+                    <div class="linea delanteros" id="delanteros"></div>
+                    <div class="linea medios" id="mediocampistas"></div>
+                    <div class="linea defensas" id="defensas"></div>
+                    <div class="linea portero" id="portero"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Añadido sidebar derecho para controles con toggle -->
+        <button class="sidebar-toggle right" id="toggleRightSidebar" onclick="toggleSidebar('right')">
+            <span class="toggle-icon">▶</span>
+        </button>
+
+        <aside class="sidebar right-sidebar" id="rightSidebar">
+            <div class="sidebar-header">
+                <h2>⚙️ CONTROLES</h2>
+                <button class="close-sidebar" onclick="toggleSidebar('right')">✕</button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Añadido selector de formaciones -->
+                <div class="formation-selector">
+                    <label for="formacionSelect">⚔️ Formación Táctica</label>
+                    <select id="formacionSelect" onchange="cambiarFormacion(this.value)">
+                        <option value="2-2-1">⚔️ Ofensiva (1-2-2-1)</option>
+                        <option value="2-1-2">⚖️ Equilibrada (1-2-1-2)</option>
+                        <option value="1-3-1">⚡ Presión Alta (1-1-3-1)</option>
+                        <option value="1-2-2">🎯 Balanceada (1-1-2-2)</option>
+                    </select>
+                    <p class="formation-description" id="formacionDesc"></p>
+                </div>
+
+                <div class="manager-card" id="managerCard">
+                    <div class="manager-photo">👨‍💼</div>
+                    <div class="manager-info">
+                        <h3 id="managerName">Carlo Ancelotti</h3>
+                        <p id="managerCountry">🇮🇹 Italia</p>
+                        <p id="managerFormation">Formación: 1-2-2-1</p>
+                    </div>
+                </div>
+
+                <div class="instrucciones">💡 Arrastra jugadores o haz clic para intercambiar titular ↔️ suplente</div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="guardarAlineacion()">💾 GUARDAR</button>
+                    <button class="btn btn-secondary" onclick="resetearAlineacion()">🔄 RESET</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Pestaña Jugadores -->
+    <section class="jugadores-container" id="jugadores" style="display:none">
+        <div class="jugadores-navbar">
+            <h2 style="color:var(--verde);margin-bottom:12px">👥 PLANTILLA COMPLETA</h2>
+            <div class="chips" id="chipsPosiciones"></div>
+        </div>
+        <div class="tabla-jugadores">
+            <table class="tabla-plantilla">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Posición</th>
+                        <th>País</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="listaJugadores"></tbody>
+            </table>
+        </div>
+        <div style="margin-top:18px">
+            <div class="manager-card">
+                <div class="manager-photo">👨‍💼</div>
+                <div class="manager-info">
+                    <h3 id="mgrNameList">Carlo Ancelotti</h3>
+                    <p id="mgrCountryList">🇮🇹 Italia</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pestaña Estadísticas unificada con todo: avisos, stats, partidos y lesiones -->
+    <section class="estadisticas-container" id="estadisticas" style="display:none">
+        <!-- Avisos y Notificaciones -->
+        <div class="stats-section">
+            <h2 class="section-title">⚠️ Avisos y Notificaciones</h2>
+            <div class="cards" id="avisosCards"></div>
+        </div>
+
+        <!-- Estadísticas del Equipo -->
+        <div class="stats-section">
+            <h2 class="section-title">📊 Estadísticas del Equipo</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPartidos">0</div>
+                    <div class="stat-label">Partidos Jugados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="victorias">0</div>
+                    <div class="stat-label">Victorias</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="empates">0</div>
+                    <div class="stat-label">Empates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="derrotas">0</div>
+                    <div class="stat-label">Derrotas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos Partidos -->
+        <div class="stats-section">
+            <h2 class="section-title">📅 Próximos Partidos</h2>
+            <div class="cards" id="proximosPartidosCards"></div>
+        </div>
+
+        <!-- Historial de Partidos -->
+        <div class="stats-section">
+            <h2 class="section-title">🏆 Historial de Partidos</h2>
+            <div class="cards" id="partidosCards"></div>
+        </div>
+
+        <!-- Jugadores Lesionados -->
+        <div class="stats-section">
+            <h2 class="section-title">🚑 Jugadores Lesionados</h2>
+            <div class="cards" id="lesionesCards"></div>
+        </div>
+
+        <!-- Jugadores Disponibles -->
+        <div class="stats-section">
+            <h2 class="section-title">✅ Jugadores Disponibles</h2>
+            <div class="disponibles-grid" id="disponiblesGrid"></div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="modalEquipo">
+        <div class="modal-content">
+            <h2>✏️ Editar Equipo</h2>
+            <input type="text" id="inputTeamName" placeholder="Nombre del equipo" />
+            <input type="text" id="inputTeamLogo" placeholder="Emoji del logo (ej: ⚽)" />
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="guardarEquipo()">Guardar</button>
+                <button class="btn btn-secondary" onclick="cerrarModalEquipo()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

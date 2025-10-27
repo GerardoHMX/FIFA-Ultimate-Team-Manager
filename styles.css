@@ -1,0 +1,919 @@
+:root {
+    --verde: #00ff88;
+    --gris: #1a1a1a;
+    --gris-2: #222;
+    --gris-3: #2a2a2a;
+    --borde: #333;
+    --gap-linea: clamp(18px, 3vw, 60px);
+    --sep-vertical: clamp(80px, 12vh, 240px);
+    --card-w: clamp(72px, 9vw, 120px);
+    --card-h: clamp(108px, 13vw, 170px);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #101010;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(to bottom, #2a2a2a, #141414);
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--borde);
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.team-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: 3px solid #fff;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.45);
+}
+
+.team-info h1 {
+    font-size: clamp(18px, 3vw, 24px);
+    margin-bottom: 2px;
+}
+
+.team-stats {
+    display: flex;
+    gap: 12px;
+    color: #bbb;
+    font-size: .95rem;
+}
+
+.stat-item {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background: #444;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #555;
+}
+
+/* Tabs mejoradas */
+.tabs {
+    display: flex;
+    background: var(--gris-2);
+    border-bottom: 2px solid var(--borde);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.tab {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+    padding: 14px 10px;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-weight: 800;
+    letter-spacing: .4px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.tab.active {
+    border-bottom-color: var(--verde);
+    background: var(--gris-3);
+    color: var(--verde);
+}
+
+/* Nuevo layout para vista de campo sin sidebar */
+.main-campo {
+    display: flex;
+    position: relative;
+    min-height: calc(100vh - 116px);
+}
+
+.campo-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    transition: margin 0.3s ease;
+}
+
+/* Estilos para sidebars deslizables */
+.sidebar {
+    position: fixed;
+    top: 116px;
+    bottom: 0;
+    width: 320px;
+    background: linear-gradient(to bottom, #1a1a1a, #0f0f0f);
+    border: 2px solid var(--borde);
+    z-index: 100;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.left-sidebar {
+    left: 0;
+    border-right: 2px solid var(--verde);
+    transform: translateX(-100%);
+}
+
+.left-sidebar.active {
+    transform: translateX(0);
+}
+
+.right-sidebar {
+    right: 0;
+    border-left: 2px solid var(--verde);
+    transform: translateX(100%);
+}
+
+.right-sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    position: sticky;
+    top: 0;
+    background: var(--gris-2);
+    padding: 16px;
+    border-bottom: 2px solid var(--borde);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.sidebar-header h2 {
+    color: var(--verde);
+    font-size: 1.1rem;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.close-sidebar {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.2s;
+}
+
+.close-sidebar:hover {
+    color: var(--verde);
+    transform: scale(1.2);
+}
+
+.sidebar-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100% - 60px);
+}
+
+/* Botones toggle para abrir/cerrar sidebars */
+.sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--verde), #00cc70);
+    border: 2px solid var(--verde);
+    color: #000;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+}
+
+.sidebar-toggle:hover {
+    background: linear-gradient(135deg, #00ff88, #00dd7a);
+    box-shadow: 0 6px 16px rgba(0, 255, 136, 0.5);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.sidebar-toggle.left {
+    left: 0;
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+}
+
+.sidebar-toggle.right {
+    right: 0;
+    border-radius: 12px 0 0 12px;
+    border-right: none;
+}
+
+.sidebar-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.toggle-icon {
+    font-weight: 900;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-toggle.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Grid de suplentes en sidebar izquierdo */
+.left-sidebar .suplentes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 16px;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 280px;
+    }
+
+    .left-sidebar .suplentes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Campo optimizado para ocupar espacio vertical sin scroll */
+.campo {
+    position: relative;
+    height: calc(100vh - 116px);
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(to bottom, #145028e6, #0f3c1ee6, #145028e6);
+    overflow: hidden;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .campo {
+        height: 50vh;
+        min-height: 400px;
+    }
+}
+
+.campo-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.center-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+}
+
+.center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.penalty-area {
+    position: absolute;
+    width: min(62%, 520px);
+    height: 120px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.penalty-area.top {
+    top: 0;
+    border-top: none;
+}
+
+.penalty-area.bottom {
+    bottom: 0;
+    border-bottom: none;
+}
+
+.campo-jugadores {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 30px 20px;
+}
+
+/* Líneas optimizadas para 6 jugadores (1-2-2-1) */
+.linea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(40px, 6vw, 80px);
+    width: 100%;
+}
+
+/* Footer del campo con manager, suplentes y botones */
+
+/* Sección de suplentes ocupa columna izquierda completa */
+.suplentes-section {
+    width: 100%;
+    height: 100%;
+}
+
+.suplentes-section h2 {
+    color: var(--verde);
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    letter-spacing: .5px;
+}
+
+/* Grid de suplentes optimizado para mostrar todos sin scroll */
+.suplentes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 14px;
+    max-height: none;
+    overflow-y: visible;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .suplentes-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .suplentes-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Tarjetas optimizadas para iPad con proporciones correctas */
+.player-card {
+    width: 100%;
+    max-width: 110px;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.55));
+}
+
+.player-card:hover {
+    transform: translateY(-6px) scale(1.05);
+    filter: drop-shadow(0 8px 20px rgba(255, 215, 0, 0.4));
+}
+
+.player-card.selected {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 24px rgba(0, 255, 136, 0.8));
+}
+
+.suplente-card {
+    max-width: 100px;
+    aspect-ratio: 3 / 4;
+}
+
+.card-shape {
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(50% 0%, 100% 15%, 100% 85%, 50% 100%, 0% 85%, 0% 15%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+}
+
+.card-shape.gold {
+    background: linear-gradient(135deg, #d4af37, #a48627);
+    border-color: #ffd700;
+}
+
+.card-shape.silver {
+    background: linear-gradient(135deg, #c0c0c0, #808080);
+    border-color: #e8e8e8;
+}
+
+.card-shape.bronze {
+    background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+    border-color: #cd7f32;
+}
+
+/* Nueva sección de controles en columna derecha */
+.controles-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+/* Tarjetas optimizadas sin ícono de balón */
+.card-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 14px 8px;
+    gap: 4px;
+}
+
+.card-rating {
+    font-weight: 900;
+    font-size: clamp(22px, 3.5vw, 32px);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    line-height: 1;
+}
+
+.card-position {
+    font-size: .75rem;
+    font-weight: 800;
+    opacity: 0.9;
+    margin-top: -2px;
+}
+
+/* Nombre del jugador más grande y visible */
+.card-name {
+    font-size: .85rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    max-width: 95%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.9);
+    letter-spacing: 0.3px;
+}
+
+.card-flag {
+    font-size: 1.4rem;
+    margin: 2px 0;
+}
+
+.manager-card {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    background: linear-gradient(135deg, #2a2a2a, #181818);
+    border: 2px solid #555;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.manager-card:hover {
+    border-color: var(--verde);
+    transform: translateX(4px);
+}
+
+.manager-photo {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #777;
+    background: linear-gradient(135deg, #444, #666);
+    font-size: 26px;
+}
+
+.manager-info h3 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.manager-info p {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin: 2px 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: stretch;
+    margin-top: auto;
+}
+
+.action-buttons .btn {
+    flex: 1;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--verde), #00cc70);
+    color: #000;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 14px rgba(0, 255, 136, 0.35);
+}
+
+.instrucciones {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--verde);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-size: .9rem;
+}
+
+/* Estilos para el selector de formaciones */
+.formation-selector {
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+    border: 2px solid var(--verde);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.formation-selector label {
+    display: block;
+    color: var(--verde);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.formation-selector select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #444;
+    background: #111;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.formation-selector select:hover {
+    border-color: var(--verde);
+}
+
+.formation-selector select:focus {
+    outline: none;
+    border-color: var(--verde);
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+.formation-description {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #aaa;
+    line-height: 1.4;
+    text-align: justify;
+}
+
+/* Pestaña Estadísticas con scroll y secciones organizadas */
+.estadisticas-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    max-height: calc(100vh - 116px);
+    overflow-y: auto;
+}
+
+.stats-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    color: var(--verde);
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    letter-spacing: .5px;
+    border-bottom: 2px solid var(--borde);
+    padding-bottom: 8px;
+}
+
+/* Pestaña Jugadores */
+.jugadores-container {
+    padding: 18px;
+    max-width: 1400px;
+    margin: 0 auto;
+    max-height: calc(100vh - 116px);
+    overflow-y: auto;
+}
+
+.jugadores-navbar {
+    position: sticky;
+    top: 0;
+    background: #101010;
+    border-bottom: 2px solid #333;
+    padding: 16px 0;
+    margin-bottom: 20px;
+    z-index: 5;
+}
+
+.chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.chip:hover {
+    background: #333;
+}
+
+.chip.active {
+    background: var(--verde);
+    color: #000;
+    border-color: var(--verde);
+}
+
+.tabla-jugadores {
+    overflow-x: auto;
+    margin: 20px 0;
+    background: #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-plantilla {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-plantilla th {
+    background: #222;
+    padding: 12px 16px;
+    font-weight: 600;
+    border-bottom: 2px solid #333;
+}
+
+.tabla-plantilla td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #333;
+}
+
+.tabla-plantilla tr:hover {
+    background: #222;
+}
+
+.tabla-plantilla .estado-titular {
+    color: var(--verde);
+    font-weight: 600;
+}
+
+.tabla-plantilla .estado-suplente {
+    color: #aaa;
+}
+
+/* Cards responsivas */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+@media (max-width: 768px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: #161616;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.2s;
+}
+
+.card:hover {
+    border-color: var(--verde);
+    transform: translateY(-2px);
+}
+
+.card h4 {
+    margin-bottom: 6px;
+}
+
+/* Grid de estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    border-color: var(--verde);
+    transform: scale(1.05);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--verde);
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Grid de jugadores disponibles */
+.disponibles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.disponible-card {
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.disponible-card:hover {
+    border-color: var(--verde);
+}
+
+.disponible-card .player-name {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.disponible-card .player-pos {
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #222;
+    padding: 24px;
+    border-radius: 12px;
+    border: 2px solid var(--verde);
+    min-width: min(520px, 94vw);
+}
+
+.modal-content h2 {
+    color: var(--verde);
+    margin-bottom: 12px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Ajustes para manager card en sidebar derecho */
+.right-sidebar .manager-card {
+    width: 100%;
+}
+
+.right-sidebar .action-buttons {
+    margin-top: auto;
+}
+
+/* Mejoras de responsividad para iPad */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .campo {
+        height: calc(100vh - 116px);
+    }
+
+    .tabs {
+        overflow-x: auto;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar {
+        width: 300px;
+    }
+}
+
+@media (max-width: 767px) {
+    .sidebar {
+        width: 90vw;
+        max-width: 320px;
+    }
+
+    .sidebar-toggle {
+        width: 36px;
+        height: 70px;
+    }
+}
