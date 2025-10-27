@@ -172,6 +172,7 @@ function crearTarjeta(j, esSuplente = false) {
     const card = document.createElement("div")
     card.className = `player-card ${esSuplente ? "suplente-card" : ""}`
     card.dataset.id = j.id
+    card.dataset.jugador = JSON.stringify(j)
     card.draggable = true
     card.innerHTML = `
     <div class="card-shape gold">
@@ -181,7 +182,46 @@ function crearTarjeta(j, esSuplente = false) {
         <div class="card-name">${j.nombre}</div>
         </div>
     </div>`
-    card.addEventListener("click", () => manejarClick(j, card))
+    
+    // Sistema híbrido de interacción (mouse y touch)
+    let touchTimeout
+    let hasMoved = false
+    
+    card.addEventListener("mousedown", () => manejarClick(j, card))
+    
+    // Eventos touch
+    card.addEventListener("touchstart", (e) => {
+        hasMoved = false
+        touchTimeout = setTimeout(() => {
+            manejarClick(j, card)
+        }, 200)
+    })
+    
+    // Eventos táctiles para iPad
+    card.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        jugadorSeleccionado = j;
+        card.classList.add("dragging");
+    });
+    
+    card.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        card.classList.remove("dragging");
+        const touch = e.changedTouches[0];
+        const elementoObjetivo = document.elementFromPoint(touch.clientX, touch.clientY);
+        const tarjetaObjetivo = elementoObjetivo.closest(".player-card");
+        
+        if (tarjetaObjetivo) {
+            const jugadorObjetivo = jugadores.find(
+                jugador => jugador.nombre === tarjetaObjetivo.querySelector(".card-name:last-child").textContent
+            );
+            if (jugadorObjetivo) {
+                manejarIntercambio(jugadorSeleccionado, jugadorObjetivo);
+            }
+        }
+        jugadorSeleccionado = null;
+    });
+    
     card.addEventListener("dragstart", (e) => {
         e.dataTransfer.setData("text", j.id)
         card.classList.add("dragging")
@@ -272,19 +312,28 @@ function actualizarManager() {
 
 function habilitarMovimiento() {
     document.querySelectorAll(".linea, .campo-jugadores").forEach((cont) => {
-        cont.addEventListener("dragover", (e) => e.preventDefault())
-        cont.addEventListener("drop", (e) => {
+        cont.addEventListener("dragover", (e) => {
             e.preventDefault()
-            const id = Number.parseInt(e.dataTransfer.getData("text"))
-            const j = jugadores.find((x) => x.id === id)
-            if (j) {
-                j.linea = cont.id || j.linea
-                j.titular = true
-                render()
+            const draggable = document.querySelector(".dragging")
+            if (draggable) cont.appendChild(draggable)
+        })
+
+        // Agregar soporte para eventos táctiles
+        cont.addEventListener("touchmove", (e) => {
+            e.preventDefault()
+            const touch = e.touches[0]
+            const draggable = document.querySelector(".dragging")
+            if (!draggable) return
+
+            const elementoDebajo = document.elementFromPoint(touch.clientX, touch.clientY)
+            const contenedorObjetivo = elementoDebajo.closest(".linea, .campo-jugadores")
+            
+            if (contenedorObjetivo) {
+                contenedorObjetivo.appendChild(draggable)
             }
         })
     })
-}
+    }
 
 function cambiarFormacion6() {
     // Resetear todos a suplentes
@@ -626,8 +675,18 @@ function cargarEstadoSidebars() {
     }
 }
 
+// Detectar tipo de dispositivo
+const isTouchDevice = () => {
+    return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+}
+
 // ====== START ======
 document.addEventListener("DOMContentLoaded", () => {
+    // Agregar clase al body según el tipo de dispositivo
+    if (isTouchDevice()) {
+        document.body.classList.add('touch-device');
+    }
+    
     cargarAlineacion()
     cargarEstadoSidebars()
     cambiarFormacion6()
