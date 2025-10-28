@@ -182,51 +182,116 @@ function crearTarjeta(j, esSuplente = false) {
         <div class="card-name">${j.nombre}</div>
         </div>
     </div>`
-    
-    // Sistema híbrido de interacción (mouse y touch)
-    let touchTimeout
-    let hasMoved = false
-    
-    card.addEventListener("mousedown", () => manejarClick(j, card))
-    
-    // Eventos touch
-    card.addEventListener("touchstart", (e) => {
-        hasMoved = false
-        touchTimeout = setTimeout(() => {
-            manejarClick(j, card)
-        }, 200)
-    })
-    
-    // Eventos táctiles para iPad
-    card.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        jugadorSeleccionado = j;
-        card.classList.add("dragging");
-    });
-    
-    card.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        card.classList.remove("dragging");
-        const touch = e.changedTouches[0];
-        const elementoObjetivo = document.elementFromPoint(touch.clientX, touch.clientY);
-        const tarjetaObjetivo = elementoObjetivo.closest(".player-card");
-        
-        if (tarjetaObjetivo) {
-            const jugadorObjetivo = jugadores.find(
-                jugador => jugador.nombre === tarjetaObjetivo.querySelector(".card-name:last-child").textContent
-            );
-            if (jugadorObjetivo) {
-                manejarIntercambio(jugadorSeleccionado, jugadorObjetivo);
-            }
+
+    // Sistema de click para PC
+    card.addEventListener("click", () => {
+        if (!jugadorSeleccionado) {
+            // Primera tarjeta seleccionada
+            jugadorSeleccionado = j
+            card.classList.add("selected")
+        } else {
+            // Segunda tarjeta - realizar intercambio
+            const jugadorObjetivo = j
+            document.querySelector(".selected")?.classList.remove("selected")
+            
+            // Intercambiar titularidad
+            const temp = jugadorSeleccionado.titular
+            jugadores.find(jug => jug.nombre === jugadorSeleccionado.nombre).titular = 
+                jugadores.find(jug => jug.nombre === jugadorObjetivo.nombre).titular
+            jugadores.find(jug => jug.nombre === jugadorObjetivo.nombre).titular = temp
+            
+            // Limpiar selección y actualizar
+            jugadorSeleccionado = null
+            render()
         }
-        jugadorSeleccionado = null;
-    });
-    
+    })
+
+    // Sistema de arrastrar para todos los dispositivos
     card.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text", j.id)
+        e.dataTransfer.setData("jugador", JSON.stringify(j))
         card.classList.add("dragging")
     })
-    card.addEventListener("dragend", () => card.classList.remove("dragging"))
+
+    card.addEventListener("dragend", () => {
+        card.classList.remove("dragging")
+    })
+
+    card.addEventListener("dragover", (e) => {
+        e.preventDefault()
+    })
+
+    card.addEventListener("drop", (e) => {
+        e.preventDefault()
+        const jugadorArrastrado = JSON.parse(e.dataTransfer.getData("jugador"))
+        
+        // Intercambiar titularidad
+        const temp = jugadores.find(jug => jug.nombre === jugadorArrastrado.nombre).titular
+        jugadores.find(jug => jug.nombre === jugadorArrastrado.nombre).titular = 
+            jugadores.find(jug => jug.nombre === j.nombre).titular
+        jugadores.find(jug => jug.nombre === j.nombre).titular = temp
+        
+        render()
+    })
+
+    // Sistema táctil para dispositivos móviles/iPad
+    let initialX, initialY, initialLeft, initialTop
+
+    card.addEventListener("touchstart", (e) => {
+        const touch = e.touches[0]
+        initialX = touch.clientX
+        initialY = touch.clientY
+        
+        const rect = card.getBoundingClientRect()
+        initialLeft = rect.left
+        initialTop = rect.top
+        
+        card.style.position = "fixed"
+        card.style.zIndex = "1000"
+        card.style.width = rect.width + "px"
+        card.style.height = rect.height + "px"
+        card.style.left = initialLeft + "px"
+        card.style.top = initialTop + "px"
+        
+        card.classList.add("dragging")
+    })
+
+    card.addEventListener("touchmove", (e) => {
+        e.preventDefault()
+        const touch = e.touches[0]
+        const deltaX = touch.clientX - initialX
+        const deltaY = touch.clientY - initialY
+        
+        card.style.left = (initialLeft + deltaX) + "px"
+        card.style.top = (initialTop + deltaY) + "px"
+    })
+
+    card.addEventListener("touchend", (e) => {
+        e.preventDefault()
+        card.style.position = ""
+        card.style.zIndex = ""
+        card.style.width = ""
+        card.style.height = ""
+        card.style.left = ""
+        card.style.top = ""
+        card.classList.remove("dragging")
+        
+        const touch = e.changedTouches[0]
+        const elementoDebajo = document.elementFromPoint(touch.clientX, touch.clientY)
+        const tarjetaObjetivo = elementoDebajo?.closest(".player-card")
+        
+        if (tarjetaObjetivo && tarjetaObjetivo !== card) {
+            const jugadorObjetivo = JSON.parse(tarjetaObjetivo.dataset.jugador)
+            
+            // Intercambiar titularidad
+            const temp = jugadores.find(jug => jug.nombre === j.nombre).titular
+            jugadores.find(jug => jug.nombre === j.nombre).titular = 
+                jugadores.find(jug => jug.nombre === jugadorObjetivo.nombre).titular
+            jugadores.find(jug => jug.nombre === jugadorObjetivo.nombre).titular = temp
+            
+            render()
+        }
+    })
+
     return card
 }
 
