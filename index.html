@@ -3,10 +3,9 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>FIFA Ultimate Team Manager</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="script.js"></script>
 </head>
 
 <body>
@@ -92,8 +91,8 @@
                 <div class="manager-card" id="managerCard">
                     <div class="manager-photo">👨‍💼</div>
                     <div class="manager-info">
-                        <h3 id="managerName">Carlo Ancelotti</h3>
-                        <p id="managerCountry">🇮🇹 Italia</p>
+                        <h3 id="managerName">Gerardo Huizar Castro</h3>
+                        <p id="managerCountry">🇲🇽 México</p>
                         <p id="managerFormation">Formación: 1-2-2-1</p>
                     </div>
                 </div>
@@ -118,6 +117,7 @@
             <table class="tabla-plantilla">
                 <thead>
                     <tr>
+                        <th>Foto</th>
                         <th>Nombre</th>
                         <th>Posición</th>
                         <th>País</th>
@@ -206,6 +206,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de ayuda para Google Sheets -->
+    <div class="modal" id="modalAyuda">
+        <div class="modal-content">
+            <h2>📊 Cómo usar Google Sheets</h2>
+            <div class="help-content">
+                <h3>Paso 1: Crear tu hoja de cálculo</h3>
+                <p>Crea una Google Sheet con las siguientes columnas:</p>
+                <ul>
+                    <li><strong>nombre</strong>: Nombre del jugador</li>
+                    <li><strong>posicion</strong>: POR, DEF, MC o DEL</li>
+                    <li><strong>pais</strong>: Emoji de bandera (ej: 🇪🇸)</li>
+                    <li><strong>foto</strong>: URL de la foto (opcional)</li>
+                    <li><strong>titular</strong>: TRUE o FALSE</li>
+                    <li><strong>lesionado</strong>: TRUE o FALSE</li>
+                </ul>
+
+                <h3>Paso 2: Hacer pública tu hoja</h3>
+                <p>1. Archivo → Compartir → Publicar en la web</p>
+                <p>2. Copia el ID de la URL (entre /d/ y /edit)</p>
+
+                <h3>Paso 3: Pegar el ID</h3>
+                <p>Pega el ID en el campo de arriba y haz clic en "CARGAR DATOS"</p>
+            </div>
+            <button class="btn btn-primary" onclick="cerrarModalAyuda()">Entendido</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 
 </html>

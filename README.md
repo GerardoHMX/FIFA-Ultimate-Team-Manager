@@ -1,183 +1,158 @@
-<div align="center">
+# FIFA Ultimate Team Manager - Versión Mejorada
 
-# 🏆 FIFA Ultimate Team Manager
+Una aplicación web de gestión táctica para fútbol 6 con integración a Google Sheets, diseño responsivo y colores estilo FIFA.
 
+## Nuevas Características
 
-<img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="version"/>
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" alt="HTML5"/>
-<img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white" alt="CSS3"/>
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" alt="JavaScript"/>
+### Integración con Google Sheets (Hardcodeada)
+- El ID de Google Sheets está configurado directamente en el código
+- Carga automática de datos al iniciar la aplicación
+- No necesitas ingresar el ID manualmente cada vez
 
----
+### Diseño Responsivo Completo
+- Optimizado para computadoras, tablets (iPads) y móviles
+- Colores inspirados en FIFA: negro oscuro, verde neón, tarjetas doradas
+- Animaciones suaves y efectos visuales mejorados
 
-<p align="center">
-  <strong>Una aplicación web de gestión táctica para fútbol 6</strong><br>
-  Diseñada para ofrecer una experiencia premium similar a FIFA Ultimate Team
-</p>
+### Fotos de Jugadores
+- Agrega fotos personalizadas mediante URL
+- Icono de persona (👤) por defecto si no hay foto
+- Visualización en tarjetas, tabla y estadísticas
 
-[🚀 Características](#características) •
-[🎮 Demo](https://gerardohmx.github.io/FIFA-Ultimate-Team-Manager)
-[🛠️ Instalación](#instalación) •
-[📖 Uso](#uso) •
-[📱 Compatibilidad](#compatibilidad)
+### Drag & Drop Mejorado
+- Funciona con mouse en computadora
+- Soporte táctil completo para iPad y tablets
+- Sistema híbrido: arrastra o haz clic para intercambiar
 
-</div>
+## Configuración de Google Sheets
 
----
+### Paso 1: Editar el ID en el Código
 
-## ✨ Vista Previa
+Abre el archivo `script.js` y busca esta línea (cerca del inicio):
 
-link: https://gerardohmx.github.io/FIFA-Ultimate-Team-Manager
+\`\`\`javascript
+const GOOGLE_SHEET_ID = "1234567890abcdefghijklmnopqrstuvwxyz";
+\`\`\`
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <strong>Vista Campo</strong><br>
-        🏟️ Campo Interactivo
-      </td>
-      <td align="center">
-        <strong>Gestión Equipo</strong><br>
-        👥 Plantilla Completa
-      </td>
-      <td align="center">
-        <strong>Estadísticas</strong><br>
-        📊 Panel Datos
-      </td>
-    </tr>
-  </table>
-</div>
+Reemplaza el ID con el de tu Google Sheet:
 
-## 🌟 Características Principales
+\`\`\`javascript
+const GOOGLE_SHEET_ID = "TU_ID_AQUI";
+\`\`\`
 
-### 📋 Gestión de Equipo
-- **Formaciones Tácticas**
-  - Ofensiva (1-2-2-1): Ataque constante con presión alta
-  - Equilibrada (1-2-1-2): Balance entre defensa y ataque
-  - Presión Alta (1-1-3-1): Enfoque en recuperación de balón
-  - Balanceada (1-1-2-2): Versatilidad táctica
+### Paso 2: Crear tu Hoja de Cálculo
 
-- **Posiciones de Jugadores**
-  - POR: Portero
-  - DEF: Defensa
-  - MC: Mediocampista
-  - DEL: Delantero
+Crea una Google Sheet con estas columnas (en este orden):
 
-### 🎮 Controles e Interacción
-- Arrastrar y soltar jugadores para cambiar posiciones
-- Intercambio rápido entre titulares y suplentes
-- Sidebars desplegables para mejor organización
-- Sistema de clicks para selección e intercambio
+| nombre | posicion | pais | foto | titular | lesionado |
+|--------|----------|------|------|---------|-----------|
+| Dasi | POR | 🇪🇸 | https://... | TRUE | FALSE |
+| Susete | DEF | 🇪🇸 | | TRUE | FALSE |
+| Hugo | MC | 🇪🇸 | https://... | TRUE | FALSE |
+| Ricardo | DEL | 🇪🇸 | | TRUE | FALSE |
 
-### 👥 Gestión de Plantilla
-- Vista detallada de todos los jugadores
-- Filtrado por posición y estado (titular/suplente)
-- Sistema de tarjetas doradas para todos los jugadores
-- Información detallada de cada jugador (nombre, posición, país)
+**Columnas:**
+- **nombre**: Nombre del jugador
+- **posicion**: POR, DEF, MC o DEL
+- **pais**: Emoji de bandera (🇪🇸, 🇲🇽, 🇧🇷, etc.)
+- **foto**: URL de la foto (opcional, dejar vacío para icono)
+- **titular**: TRUE o FALSE
+- **lesionado**: TRUE o FALSE
 
-### 📊 Estadísticas y Seguimiento
-- **Panel de Estadísticas**
-  - Partidos jugados
-  - Victorias
-  - Empates
-  - Derrotas
+### Paso 3: Hacer Pública tu Hoja
 
-- **Gestión de Partidos**
-  - Próximos encuentros
-  - Historial de resultados
-  - Seguimiento de lesiones
+1. En Google Sheets: **Archivo → Compartir → Publicar en la web**
+2. Selecciona formato **CSV**
+3. Haz clic en **Publicar**
 
-### ⚙️ Personalización
-- Edición del nombre del equipo
-- Personalización del logo (emojis)
-- Guardado local de configuraciones
-- Reset de alineación
+### Paso 4: Obtener el ID
 
-### 📱 Diseño Responsivo
-- Interfaz adaptable a diferentes dispositivos
-- Controles optimizados para móvil y tablet
-- Visualización clara en cualquier pantalla
+De la URL de tu Google Sheet:
+\`\`\`
+https://docs.google.com/spreadsheets/d/ABC123XYZ456/edit
+\`\`\`
 
-## 💾 Almacenamiento
-- Guardado automático de alineaciones
-- Persistencia de datos en localStorage
-- Recuperación de configuraciones previas
+Copia solo el ID (entre `/d/` y `/edit`):
+\`\`\`
+ABC123XYZ456
+\`\`\`
 
-## 💻 Requisitos del Sistema
+## Características Principales
 
-| Navegador | Versión Mínima |
-|-----------|----------------|
-| Chrome    | 60+           |
-| Firefox   | 60+           |
-| Safari    | 12+           |
-| Edge      | 79+           |
+### Gestión de Equipo
+- 4 formaciones tácticas: Ofensiva, Equilibrada, Presión Alta, Balanceada
+- Intercambio fácil entre titulares y suplentes
+- Mínimo 6 jugadores titulares garantizado
 
-## 🚀 Instalación
+### Controles
+- **Desktop**: Arrastra y suelta con el mouse
+- **Tablet/iPad**: Toca y arrastra con el dedo
+- **Móvil**: Toca para seleccionar e intercambiar
 
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/usuario/fifa-ultimate-team-manager.git
-   ```
+### Sidebars Desplegables
+- **Izquierdo**: Suplentes disponibles
+- **Derecho**: Controles y configuración
 
-2. **Abrir el proyecto**
-   ```bash
-   cd fifa-ultimate-team-manager
-   ```
+### Estadísticas
+- Partidos jugados, victorias, empates, derrotas
+- Próximos partidos y historial
+- Jugadores lesionados y disponibles
 
-3. **Iniciar servidor local**
-   ```bash
-   # Usando Python
-   python -m http.server 8000
-   # O con PHP
-   php -S localhost:8000
-   ```
+## Paleta de Colores
 
-## 📱 Compatibilidad
+Inspirada en la interfaz de FIFA Ultimate Team:
 
-| Dispositivo | Estado | Notas |
-|-------------|--------|-------|
-| Desktop     | ✅     | Experiencia completa |
-| Tablet      | ✅     | Optimizado |
-| Móvil      | ✅     | Responsive |
+- **Fondo**: Negro oscuro (#1a1a1a)
+- **Acento**: Verde neón (#00ff41)
+- **Tarjetas**: Dorado (#c8a14a, #d4af37)
+- **Campo**: Verde oscuro (#2d5016, #1a3a0f)
+- **UI**: Grises (#2a2a2a, #3a3a3a)
 
-## 🎯 Características Especiales
+## Instalación
 
-- ⚡ Mínimo de 6 jugadores titulares garantizado
-- 📢 Sistema de avisos y notificaciones en tiempo real
-- 🏟️ Vista de campo de juego totalmente interactiva
-- 🚑 Gestión avanzada de estado de jugadores
+1. Descarga los archivos: `index.html`, `script.js`, `styles.css`
+2. Edita el `GOOGLE_SHEET_ID` en `script.js`
+3. Abre `index.html` en tu navegador
+4. Los datos se cargarán automáticamente desde Google Sheets
 
-## � Roadmap
+## Compatibilidad
 
-- [ ] Sistema de torneos
-- [ ] Estadísticas avanzadas
-- [ ] Modo carrera
-- [ ] Nuevas formaciones tácticas
+- Chrome, Firefox, Safari, Edge (últimas versiones)
+- Windows, macOS, Linux
+- iPad, tablets Android
+- iPhone, móviles Android
 
-## 📜 Licencia
+## Tecnologías
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
+- HTML5
+- CSS3 (Flexbox, Grid, Animaciones, Media Queries)
+- JavaScript ES6+
+- Google Sheets API (CSV público)
+- LocalStorage para persistencia
+
+## Notas Importantes
+
+- Los datos se guardan localmente en tu navegador
+- La hoja de Google Sheets debe ser pública
+- Las fotos deben ser URLs accesibles públicamente
+- Usa servicios como Imgur o Google Drive para alojar fotos
+
+## Personalización
+
+Puedes personalizar:
+- Nombre del equipo (botón "EDITAR EQUIPO")
+- Logo del equipo (emoji)
+- Formación táctica (selector en controles)
+- Jugadores y datos (vía Google Sheets)
+
+## Próximas Mejoras
+
+- Autenticación con Google para hojas privadas
+- Subir fotos directamente desde la app
+- Exportar alineación como imagen
+- Múltiples equipos
 
 ---
 
-<div align="center">
-
-### 🌟 Contribuidores
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/GerardoHuizar">
-        <img src="https://github.com/identicon.png" width="100px;" alt="Gerardo Huizar"/><br />
-        <sub><b>Gerardo Huizar Castro</b></sub>
-      </a><br />
-      🎯 Desarrollo Principal
-    </td>
-  </tr>
-</table>
-
-<br/>
-
-**¿Te gusta el proyecto? ¡Dale una ⭐!**
-
-</div>
+**Desarrollado por Gerardo Huizar Castro**  
+Proyecto Escolar - FIFA Ultimate Team Manager

@@ -8,6 +8,7 @@ let jugadores = [
         linea: "portero",
         titular: true,
         lesionado: false,
+        foto: "", // Agregado campo foto
     },
     {
         id: "DEF",
@@ -17,6 +18,7 @@ let jugadores = [
         linea: "defensas",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "DEF",
@@ -26,6 +28,7 @@ let jugadores = [
         linea: "defensas",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "DEF",
@@ -35,6 +38,7 @@ let jugadores = [
         linea: "defensas",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "MC",
@@ -44,6 +48,7 @@ let jugadores = [
         linea: "mediocampistas",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "MC",
@@ -53,6 +58,7 @@ let jugadores = [
         linea: "mediocampistas",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "MC",
@@ -62,6 +68,7 @@ let jugadores = [
         linea: "mediocampistas",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "DEL",
@@ -71,6 +78,7 @@ let jugadores = [
         linea: "delanteros",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "DEL",
@@ -80,6 +88,7 @@ let jugadores = [
         linea: "delanteros",
         titular: true,
         lesionado: false,
+        foto: "",
     },
     {
         id: "DEL",
@@ -89,12 +98,11 @@ let jugadores = [
         linea: "delanteros",
         titular: false,
         lesionado: false,
+        foto: "",
     },
 ]
 
-const managers = [
-    { nombre: "Gerardo Huizar Castro", pais: " 🇲🇽 México", },
-]
+const managers = [{ nombre: "Gerardo Huizar Castro", pais: " 🇲🇽 México" }]
 
 const formaciones = {
     "2-2-1": {
@@ -115,7 +123,8 @@ const formaciones = {
     },
     "1-3-1": {
         nombre: "Presión Alta",
-        descripcion: "Robar el balón en campo rival. 1 portero, 1 defensa rápido, 3 mediocampistas presionadores y 1 delantero.",
+        descripcion:
+            "Robar el balón en campo rival. 1 portero, 1 defensa rápido, 3 mediocampistas presionadores y 1 delantero.",
         portero: 1,
         defensas: 1,
         mediocampistas: 3,
@@ -144,28 +153,17 @@ let sidebarState = {
 const avisos = [
     { tipo: "⚠️", texto: "Los partidos comienzan en Enero" },
     { tipo: "🏆", texto: "Sin miedo al éxito" },
-    // { tipo: "📋", texto: "El equipo se mantiene en el top 3 de la liga" },
 ]
 
-const proximosPartidos = [
-    // { rival: "Undefined", fecha: "30/10/2025", hora: "21:00", lugar: "Local", competicion: "La Liga" },
-]
+const proximosPartidos = []
 
-const partidos = [
-    // {
-    //     rival: "Barcelona",
-    //     resultado: "2-0",
-    //     fecha: "24/10/2025",
-    //     estado: "Victoria",
-    //     detalles: "Goles: Vinicius (23'), Rodrygo (67')",
-    // },
-]
+const partidos = []
 
 // ====== UI HELPERS ======
 const byId = (id) => document.getElementById(id)
 
 function getCardClass(r) {
-    return "gold" // Todas las tarjetas son doradas
+    return "gold"
 }
 
 function crearTarjeta(j, esSuplente = false) {
@@ -174,111 +172,172 @@ function crearTarjeta(j, esSuplente = false) {
     card.dataset.id = j.id
     card.dataset.jugador = JSON.stringify(j)
     card.draggable = true
+
+    // Determinar si mostrar foto o icono
+    const fotoHTML = j.foto
+        ? `<img src="${j.foto}" alt="${j.nombre}" class="player-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" /><div class="player-icon" style="display:none;">👤</div>`
+        : `<div class="player-icon">👤</div>`
+
     card.innerHTML = `
     <div class="card-shape gold">
         <div class="card-content">
-        <div class="card-name">${j.posicion}</div>
-        <div class="card-flag">${j.pais}</div>
-        <div class="card-name">${j.nombre}</div>
+            ${fotoHTML}
+            <div class="card-name">${j.posicion}</div>
+            <div class="card-flag">${j.pais}</div>
+            <div class="card-name">${j.nombre}</div>
         </div>
     </div>`
-    
+
     // Sistema híbrido de interacción (mouse y touch)
-    let touchTimeout
-    let hasMoved = false
-    
-    card.addEventListener("mousedown", () => manejarClick(j, card))
-    
-    // Eventos touch
-    card.addEventListener("touchstart", (e) => {
-        hasMoved = false
-        touchTimeout = setTimeout(() => {
+    let touchStartX = 0
+    let touchStartY = 0
+    let isDragging = false
+
+    // Eventos mouse
+    card.addEventListener("click", (e) => {
+        if (!isDragging) {
             manejarClick(j, card)
-        }, 200)
-    })
-    
-    // Eventos táctiles para iPad
-    card.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        jugadorSeleccionado = j;
-        card.classList.add("dragging");
-    });
-    
-    card.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        card.classList.remove("dragging");
-        const touch = e.changedTouches[0];
-        const elementoObjetivo = document.elementFromPoint(touch.clientX, touch.clientY);
-        const tarjetaObjetivo = elementoObjetivo.closest(".player-card");
-        
-        if (tarjetaObjetivo) {
-            const jugadorObjetivo = jugadores.find(
-                jugador => jugador.nombre === tarjetaObjetivo.querySelector(".card-name:last-child").textContent
-            );
-            if (jugadorObjetivo) {
-                manejarIntercambio(jugadorSeleccionado, jugadorObjetivo);
-            }
         }
-        jugadorSeleccionado = null;
-    });
-    
-    card.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text", j.id)
-        card.classList.add("dragging")
     })
-    card.addEventListener("dragend", () => card.classList.remove("dragging"))
+
+    // Eventos táctiles mejorados para iPad
+    card.addEventListener("touchstart", (e) => {
+        touchStartX = e.touches[0].clientX
+        touchStartY = e.touches[0].clientY
+        isDragging = false
+
+        setTimeout(() => {
+            if (!isDragging) {
+                card.classList.add("selected")
+                jugadorSeleccionado = j
+            }
+        }, 100)
+    })
+
+    card.addEventListener("touchmove", (e) => {
+        const touchX = e.touches[0].clientX
+        const touchY = e.touches[0].clientY
+        const deltaX = Math.abs(touchX - touchStartX)
+        const deltaY = Math.abs(touchY - touchStartY)
+
+        if (deltaX > 10 || deltaY > 10) {
+            isDragging = true
+            card.classList.add("dragging")
+
+            // Crear elemento fantasma que sigue el dedo
+            const ghost = document.querySelector(".drag-ghost") || createDragGhost()
+            ghost.style.left = touchX + "px"
+            ghost.style.top = touchY + "px"
+            ghost.style.display = "block"
+        }
+    })
+
+    card.addEventListener("touchend", (e) => {
+        card.classList.remove("dragging")
+        const ghost = document.querySelector(".drag-ghost")
+        if (ghost) ghost.style.display = "none"
+
+        if (isDragging) {
+            const touch = e.changedTouches[0]
+            const elementoObjetivo = document.elementFromPoint(touch.clientX, touch.clientY)
+            const tarjetaObjetivo = elementoObjetivo ? elementoObjetivo.closest(".player-card") : null
+
+            if (tarjetaObjetivo && tarjetaObjetivo !== card) {
+                const datosObjetivo = tarjetaObjetivo.dataset.jugador
+                if (datosObjetivo) {
+                    const jugadorObjetivo = JSON.parse(datosObjetivo)
+                    manejarIntercambio(jugadorSeleccionado, jugadorObjetivo)
+                }
+            }
+
+            card.classList.remove("selected")
+            jugadorSeleccionado = null
+        }
+
+        isDragging = false
+    })
+
+    // Eventos drag estándar para desktop
+    card.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text", JSON.stringify(j))
+        card.classList.add("dragging")
+        isDragging = true
+    })
+
+    card.addEventListener("dragend", () => {
+        card.classList.remove("dragging")
+        isDragging = false
+    })
+
+    // Agregar evento drop
+    card.addEventListener("dragover", (e) => {
+        e.preventDefault()
+    })
+
+    card.addEventListener("drop", (e) => {
+        e.preventDefault()
+        const data = e.dataTransfer.getData("text")
+        if (data) {
+            const jugadorArrastrado = JSON.parse(data)
+            manejarIntercambio(jugadorArrastrado, j)
+        }
+    })
+
     return card
+}
+
+function createDragGhost() {
+    const ghost = document.createElement("div")
+    ghost.className = "drag-ghost"
+    ghost.textContent = "👤"
+    document.body.appendChild(ghost)
+    return ghost
 }
 
 function manejarClick(j, card) {
     if (!jugadorSeleccionado) {
         jugadorSeleccionado = j
+        document.querySelectorAll(".player-card").forEach((c) => c.classList.remove("selected"))
         card.classList.add("selected")
     } else {
-        if (jugadorSeleccionado.id === j.id) {
+        if (jugadorSeleccionado.id === j.id && jugadorSeleccionado.nombre === j.nombre) {
             jugadorSeleccionado = null
             card.classList.remove("selected")
         } else {
             manejarIntercambio(jugadorSeleccionado, j)
             jugadorSeleccionado = null
+            document.querySelectorAll(".player-card").forEach((card) => card.classList.remove("selected"))
         }
     }
 }
 
 function manejarIntercambio(jugadorSeleccionado, jugadorObjetivo) {
-    // Verificar que ambos jugadores existen y son diferentes
     if (jugadorSeleccionado && jugadorObjetivo && jugadorSeleccionado !== jugadorObjetivo) {
-        // Si son de la misma posición, intercambiar todo (titular y línea)
         if (jugadorSeleccionado.posicion === jugadorObjetivo.posicion) {
-            const titularTemp = jugadorSeleccionado.titular;
-            const lineaTemp = jugadorSeleccionado.linea;
-            
-            jugadorSeleccionado.titular = jugadorObjetivo.titular;
-            jugadorSeleccionado.linea = jugadorObjetivo.linea;
-            
-            jugadorObjetivo.titular = titularTemp;
-            jugadorObjetivo.linea = lineaTemp;
+            const titularTemp = jugadorSeleccionado.titular
+            const lineaTemp = jugadorSeleccionado.linea
+
+            jugadorSeleccionado.titular = jugadorObjetivo.titular
+            jugadorSeleccionado.linea = jugadorObjetivo.linea
+
+            jugadorObjetivo.titular = titularTemp
+            jugadorObjetivo.linea = lineaTemp
         } else {
-            // Si son de diferente posición, solo intercambiar estado de titular
-            const titularTemp = jugadorSeleccionado.titular;
-            jugadorSeleccionado.titular = jugadorObjetivo.titular;
-            jugadorObjetivo.titular = titularTemp;
+            const titularTemp = jugadorSeleccionado.titular
+            jugadorSeleccionado.titular = jugadorObjetivo.titular
+            jugadorObjetivo.titular = titularTemp
         }
-        
-        // Asegurar mínimo 6 jugadores titulares
-        const titulares = jugadores.filter(j => j.titular).length;
+
+        const titulares = jugadores.filter((j) => j.titular).length
         if (titulares < 6) {
-            const noTitulares = jugadores.filter(j => !j.titular && !j.lesionado);
+            const noTitulares = jugadores.filter((j) => !j.titular && !j.lesionado)
             for (let i = 0; i < 6 - titulares && i < noTitulares.length; i++) {
-                noTitulares[i].titular = true;
+                noTitulares[i].titular = true
             }
         }
 
-        // Actualizar la vista
         render()
-        
-        // Limpiar la selección visual
-        document.querySelectorAll('.player-card').forEach(card => card.classList.remove('selected'))
+        document.querySelectorAll(".player-card").forEach((card) => card.classList.remove("selected"))
     }
 }
 
@@ -314,45 +373,37 @@ function habilitarMovimiento() {
     document.querySelectorAll(".linea, .campo-jugadores").forEach((cont) => {
         cont.addEventListener("dragover", (e) => {
             e.preventDefault()
-            const draggable = document.querySelector(".dragging")
-            if (draggable) cont.appendChild(draggable)
         })
 
-        // Agregar soporte para eventos táctiles
-        cont.addEventListener("touchmove", (e) => {
+        cont.addEventListener("drop", (e) => {
             e.preventDefault()
-            const touch = e.touches[0]
-            const draggable = document.querySelector(".dragging")
-            if (!draggable) return
-
-            const elementoDebajo = document.elementFromPoint(touch.clientX, touch.clientY)
-            const contenedorObjetivo = elementoDebajo.closest(".linea, .campo-jugadores")
-            
-            if (contenedorObjetivo) {
-                contenedorObjetivo.appendChild(draggable)
+            const data = e.dataTransfer.getData("text")
+            if (data) {
+                const jugador = JSON.parse(data)
+                // Actualizar línea del jugador
+                const lineaId = cont.id || cont.closest(".linea").id
+                if (lineaId && jugador) {
+                    jugador.linea = lineaId
+                    render()
+                }
             }
         })
     })
-    }
+}
 
 function cambiarFormacion6() {
-    // Resetear todos a suplentes
     jugadores.forEach((j) => (j.titular = false))
 
-    // Seleccionar 1 portero
     const porteros = jugadores.filter((j) => j.linea === "portero")
     if (porteros[0]) porteros[0].titular = true
 
-    // Seleccionar 2 defensas
-    const defensas = jugadores.filter((j) => j.linea === "defensas").sort((a, b) => b.rating - a.rating)
+    const defensas = jugadores.filter((j) => j.linea === "defensas")
     defensas.slice(0, 2).forEach((j) => (j.titular = true))
 
-    // Seleccionar 2 mediocampistas
-    const medios = jugadores.filter((j) => j.linea === "mediocampistas").sort((a, b) => b.rating - a.rating)
+    const medios = jugadores.filter((j) => j.linea === "mediocampistas")
     medios.slice(0, 2).forEach((j) => (j.titular = true))
 
-    // Seleccionar 1 delantero
-    const delanteros = jugadores.filter((j) => j.linea === "delanteros").sort((a, b) => b.rating - a.rating)
+    const delanteros = jugadores.filter((j) => j.linea === "delanteros")
     if (delanteros[0]) delanteros[0].titular = true
 }
 
@@ -362,7 +413,6 @@ function cambiarFormacion(formacionKey) {
 
     formacionActual = formacionKey
 
-    // Obtener jugadores actuales titulares para preservarlos
     const titularesActuales = {
         portero: jugadores.filter((j) => j.titular && j.linea === "portero"),
         defensas: jugadores.filter((j) => j.titular && j.linea === "defensas"),
@@ -370,15 +420,12 @@ function cambiarFormacion(formacionKey) {
         delanteros: jugadores.filter((j) => j.titular && j.linea === "delanteros"),
     }
 
-    // Resetear todos a suplentes
     jugadores.forEach((j) => (j.titular = false))
 
-    // Función auxiliar para seleccionar jugadores por línea
     function seleccionarJugadores(linea, cantidad) {
         const actuales = titularesActuales[linea]
-        const disponibles = jugadores.filter((j) => j.linea === linea && !j.lesionado).sort((a, b) => b.rating - a.rating)
+        const disponibles = jugadores.filter((j) => j.linea === linea && !j.lesionado)
 
-        // Primero intentar mantener a los titulares actuales
         const seleccionados = []
         for (let i = 0; i < Math.min(cantidad, actuales.length); i++) {
             if (!actuales[i].lesionado) {
@@ -386,7 +433,6 @@ function cambiarFormacion(formacionKey) {
             }
         }
 
-        // Si faltan jugadores, completar con los mejores disponibles
         if (seleccionados.length < cantidad) {
             for (const jugador of disponibles) {
                 if (!seleccionados.includes(jugador) && seleccionados.length < cantidad) {
@@ -395,29 +441,24 @@ function cambiarFormacion(formacionKey) {
             }
         }
 
-        // Marcar como titulares
         seleccionados.forEach((j) => (j.titular = true))
     }
 
-    // Aplicar la nueva formación
     seleccionarJugadores("portero", formacion.portero)
     seleccionarJugadores("defensas", formacion.defensas)
     seleccionarJugadores("mediocampistas", formacion.mediocampistas)
     seleccionarJugadores("delanteros", formacion.delanteros)
 
-    // Actualizar descripción
     const desc = byId("formacionDesc")
     if (desc) {
         desc.textContent = formacion.descripcion
     }
 
-    // Actualizar selector
     const select = byId("formacionSelect")
     if (select) {
         select.value = formacionKey
     }
 
-    // Guardar formación en localStorage
     localStorage.setItem("formacionActual", formacionKey)
 
     render()
@@ -451,19 +492,23 @@ function renderListaJugadores() {
 
     let jugadoresFiltrados = jugadores
 
-    // Filtrar por estado (Titular/Suplente)
     if (filtroActivo === "TITULARES") {
         jugadoresFiltrados = jugadores.filter((j) => j.titular)
     } else if (filtroActivo === "SUPLENTES") {
         jugadoresFiltrados = jugadores.filter((j) => !j.titular)
     } else if (filtroActivo !== "TODOS") {
-        // Filtrar por posición
         jugadoresFiltrados = jugadores.filter((j) => j.posicion === filtroActivo)
     }
 
     jugadoresFiltrados.forEach((j) => {
         const tr = document.createElement("tr")
+
+        const fotoHTML = j.foto
+            ? `<img src="${j.foto}" alt="${j.nombre}" class="table-player-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" /><span class="table-player-icon" style="display:none;">👤</span>`
+            : `<span class="table-player-icon">👤</span>`
+
         tr.innerHTML = `
+            <td>${fotoHTML}</td>
             <td>${j.nombre}</td>
             <td>${j.posicion}</td>
             <td>${j.pais}</td>
@@ -498,33 +543,43 @@ function renderPartidos() {
 
     if (prox) {
         prox.innerHTML = ""
-        proximosPartidos.forEach((p) => {
-            const c = document.createElement("div")
-            c.className = "card"
-            c.innerHTML = `
-                <div style="border-left:4px solid #00ff88;padding-left:12px">
-                    <h4 style="font-size:1.1rem;margin-bottom:8px">${p.fecha} - ${p.rival}</h4>
-                    <p style="margin:4px 0"><strong>${p.competicion}</strong></p>
-                    <p style="color:#aaa;font-size:0.9rem">${p.hora} - ${p.lugar}</p>
-                </div>`
-            prox.appendChild(c)
-        })
+        if (proximosPartidos.length === 0) {
+            prox.innerHTML =
+                '<div class="card"><p style="text-align:center;color:#aaa">📅 No hay próximos partidos programados</p></div>'
+        } else {
+            proximosPartidos.forEach((p) => {
+                const c = document.createElement("div")
+                c.className = "card"
+                c.innerHTML = `
+                    <div style="border-left:4px solid #00ff88;padding-left:12px">
+                        <h4 style="font-size:1.1rem;margin-bottom:8px">${p.fecha} - ${p.rival}</h4>
+                        <p style="margin:4px 0"><strong>${p.competicion}</strong></p>
+                        <p style="color:#aaa;font-size:0.9rem">${p.hora} - ${p.lugar}</p>
+                    </div>`
+                prox.appendChild(c)
+            })
+        }
     }
 
     if (hist) {
         hist.innerHTML = ""
-        partidos.forEach((m) => {
-            const c = document.createElement("div")
-            c.className = "card"
-            const estadoColor = m.estado === "Victoria" ? "#00ff88" : m.estado === "Empate" ? "#ffd700" : "#ff4444"
-            c.innerHTML = `
-                <div style="border-left:4px solid ${estadoColor};padding-left:12px">
-                    <h4 style="font-size:1.1rem;margin-bottom:8px">${m.fecha} - ${m.rival}</h4>
-                    <p style="font-size:1.2rem;margin:8px 0"><strong>${m.resultado}</strong></p>
-                    <p style="color:#aaa;font-size:0.9rem">${m.detalles}</p>
-                </div>`
-            hist.appendChild(c)
-        })
+        if (partidos.length === 0) {
+            hist.innerHTML =
+                '<div class="card"><p style="text-align:center;color:#aaa">🏆 No hay partidos en el historial</p></div>'
+        } else {
+            partidos.forEach((m) => {
+                const c = document.createElement("div")
+                c.className = "card"
+                const estadoColor = m.estado === "Victoria" ? "#00ff88" : m.estado === "Empate" ? "#ffd700" : "#ff4444"
+                c.innerHTML = `
+                    <div style="border-left:4px solid ${estadoColor};padding-left:12px">
+                        <h4 style="font-size:1.1rem;margin-bottom:8px">${m.fecha} - ${m.rival}</h4>
+                        <p style="font-size:1.2rem;margin:8px 0"><strong>${m.resultado}</strong></p>
+                        <p style="color:#aaa;font-size:0.9rem">${m.detalles}</p>
+                    </div>`
+                hist.appendChild(c)
+            })
+        }
     }
 }
 
@@ -561,8 +616,14 @@ function renderLesiones() {
         disponibles.forEach((j) => {
             const c = document.createElement("div")
             c.className = "disponible-card"
+
+            const fotoHTML = j.foto
+                ? `<img src="${j.foto}" alt="${j.nombre}" class="disponible-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" /><div class="disponible-icon" style="display:none;">👤</div>`
+                : `<div class="disponible-icon">👤</div>`
+
             c.innerHTML = `
-                <div style="font-size:1.5rem;margin-bottom:8px">${j.pais}</div>
+                ${fotoHTML}
+                <div style="font-size:1.5rem;margin:8px 0">${j.pais}</div>
                 <div class="player-name">${j.nombre}</div>
                 <div class="player-name">${j.posicion}</div>
             `
@@ -588,6 +649,80 @@ function initTabs() {
             if (estadisticas) estadisticas.style.display = t.dataset.section === "estadisticas" ? "block" : "none"
         }),
     )
+}
+
+// ====== Google Sheets Integration ======
+const GOOGLE_SHEET_ID = "1234567890abcdefghijklmnopqrstuvwxyz" // Reemplaza con tu ID real
+
+async function cargarDesdeGoogleSheets() {
+    // Si no hay ID configurado, usar datos locales
+    if (!GOOGLE_SHEET_ID || GOOGLE_SHEET_ID === "1234567890abcdefghijklmnopqrstuvwxyz") {
+        console.log("[v0] Usando datos locales - configura GOOGLE_SHEET_ID para cargar desde Google Sheets")
+        return
+    }
+
+    try {
+        const url = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=csv`
+        const response = await fetch(url)
+
+        if (!response.ok) {
+            throw new Error("No se pudo cargar la hoja de cálculo")
+        }
+
+        const csvText = await response.text()
+        const lineas = csvText.split("\n")
+
+        const headers = lineas[0].split(",").map((h) => h.trim().toLowerCase())
+        const nuevosJugadores = []
+
+        for (let i = 1; i < lineas.length; i++) {
+            if (!lineas[i].trim()) continue
+
+            const valores = lineas[i].split(",").map((v) => v.trim())
+            const jugador = {}
+
+            headers.forEach((header, index) => {
+                jugador[header] = valores[index] || ""
+            })
+
+            let linea = ""
+            if (jugador.posicion === "POR") linea = "portero"
+            else if (jugador.posicion === "DEF") linea = "defensas"
+            else if (jugador.posicion === "MC") linea = "mediocampistas"
+            else if (jugador.posicion === "DEL") linea = "delanteros"
+
+            if (jugador.nombre && jugador.posicion && linea) {
+                nuevosJugadores.push({
+                    id: jugador.posicion,
+                    nombre: jugador.nombre,
+                    posicion: jugador.posicion,
+                    pais: jugador.pais || "🌍",
+                    linea: linea,
+                    titular: jugador.titular?.toUpperCase() === "TRUE",
+                    lesionado: jugador.lesionado?.toUpperCase() === "TRUE",
+                    foto: jugador.foto || "",
+                })
+            }
+        }
+
+        if (nuevosJugadores.length > 0) {
+            jugadores = nuevosJugadores
+
+            const titulares = jugadores.filter((j) => j.titular).length
+            if (titulares < 6) {
+                const noTitulares = jugadores.filter((j) => !j.titular && !j.lesionado)
+                for (let i = 0; i < 6 - titulares && i < noTitulares.length; i++) {
+                    noTitulares[i].titular = true
+                }
+            }
+
+            render()
+            guardarAlineacion()
+            console.log(`[v0] Cargados ${nuevosJugadores.length} jugadores desde Google Sheets`)
+        }
+    } catch (error) {
+        console.error("[v0] Error al cargar Google Sheets:", error)
+    }
 }
 
 // ====== Misc ======
@@ -650,7 +785,6 @@ function toggleSidebar(side) {
         toggle.classList.remove("active")
     }
 
-    // Guardar estado en localStorage
     localStorage.setItem("sidebarState", JSON.stringify(sidebarState))
 }
 
@@ -675,20 +809,33 @@ function cargarEstadoSidebars() {
     }
 }
 
-// Detectar tipo de dispositivo
+function abrirModalAyuda() {
+    byId("modalAyuda").classList.add("active")
+}
+
+function cerrarModalAyuda() {
+    byId("modalAyuda").classList.remove("active")
+}
+
 const isTouchDevice = () => {
-    return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
 }
 
 // ====== START ======
 document.addEventListener("DOMContentLoaded", () => {
-    // Agregar clase al body según el tipo de dispositivo
     if (isTouchDevice()) {
-        document.body.classList.add('touch-device');
+        document.body.classList.add("touch-device")
     }
-    
+
     cargarAlineacion()
     cargarEstadoSidebars()
+
+    // Forzar reflow para que el CSS se aplique correctamente
+    document.body.offsetHeight
+
+    // Intentar cargar desde Google Sheets al iniciar
+    cargarDesdeGoogleSheets()
+
     cambiarFormacion6()
     const select = byId("formacionSelect")
     if (select) {
@@ -698,7 +845,14 @@ document.addEventListener("DOMContentLoaded", () => {
             desc.textContent = formaciones[formacionActual].descripcion
         }
     }
-    render()
-    initTabs()
-    habilitarMovimiento()
+
+    setTimeout(() => {
+        render()
+        initTabs()
+        habilitarMovimiento()
+
+        setTimeout(() => {
+            render()
+        }, 100)
+    }, 50)
 })
