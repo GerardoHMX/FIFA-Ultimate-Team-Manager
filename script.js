@@ -236,15 +236,19 @@ function manejarClick(j, card) {
         jugadorSeleccionado = j
         card.classList.add("selected")
     } else {
-        // Segundo jugador seleccionado
+        // Intercambiar directamente con el segundo jugador
         const jugadorObjetivo = JSON.parse(card.dataset.jugador)
-        // Remover la selección visual
-        document.querySelector(".selected")?.classList.remove("selected")
-        // Realizar el intercambio si son diferentes jugadores
-        if (jugadorSeleccionado.id !== jugadorObjetivo.id || jugadorSeleccionado.nombre !== jugadorObjetivo.nombre) {
-            manejarIntercambio(jugadorSeleccionado, jugadorObjetivo)
-        }
-        // Resetear la selección
+        const cardSeleccionada = document.querySelector(".selected")
+        cardSeleccionada?.classList.remove("selected")
+        
+        // Intercambiar titularidad directamente
+        const temp = jugadorSeleccionado.titular
+        jugadores.find(jug => jug.nombre === jugadorSeleccionado.nombre).titular = 
+            jugadores.find(jug => jug.nombre === jugadorObjetivo.nombre).titular
+        jugadores.find(jug => jug.nombre === jugadorObjetivo.nombre).titular = temp
+        
+        // Actualizar vista inmediatamente
+        render()
         jugadorSeleccionado = null
     }
 
