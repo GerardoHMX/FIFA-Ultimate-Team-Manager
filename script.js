@@ -232,18 +232,21 @@ function crearTarjeta(j, esSuplente = false) {
 
 function manejarClick(j, card) {
     if (!jugadorSeleccionado) {
+        // Primer jugador seleccionado
         jugadorSeleccionado = j
         card.classList.add("selected")
     } else {
-        if (jugadorSeleccionado.id === j.id) {
-            jugadorSeleccionado = null
-            card.classList.remove("selected")
-        } else {
-            manejarIntercambio(jugadorSeleccionado, j)
-            jugadorSeleccionado = null
+        // Segundo jugador seleccionado
+        const jugadorObjetivo = JSON.parse(card.dataset.jugador)
+        // Remover la selección visual
+        document.querySelector(".selected")?.classList.remove("selected")
+        // Realizar el intercambio si son diferentes jugadores
+        if (jugadorSeleccionado.id !== jugadorObjetivo.id || jugadorSeleccionado.nombre !== jugadorObjetivo.nombre) {
+            manejarIntercambio(jugadorSeleccionado, jugadorObjetivo)
         }
+        // Resetear la selección
+        jugadorSeleccionado = null
     }
-}
 
 function manejarIntercambio(jugadorSeleccionado, jugadorObjetivo) {
     // Verificar que ambos jugadores existen y son diferentes
@@ -702,3 +705,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initTabs()
     habilitarMovimiento()
 })
+}
