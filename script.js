@@ -1,107 +1,3 @@
-// ====== DATA ======
-let jugadores = [
-    {
-        id: "POR",
-        nombre: "Dasi",
-        posicion: "POR",
-        pais: "🇪🇸",
-        linea: "portero",
-        titular: true,
-        lesionado: false,
-        foto: "", // Agregado campo foto
-    },
-    {
-        id: "DEF",
-        nombre: "Susete",
-        posicion: "DEF",
-        pais: "🇪🇸",
-        linea: "defensas",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "DEF",
-        nombre: "Gonzalo",
-        posicion: "DEF",
-        pais: "🇪🇸",
-        linea: "defensas",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "DEF",
-        nombre: "Darian",
-        posicion: "DEF",
-        pais: "🇪🇸",
-        linea: "defensas",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "MC",
-        nombre: "Hugo",
-        posicion: "MC",
-        pais: "🇪🇸",
-        linea: "mediocampistas",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "MC",
-        nombre: "Davidillo",
-        posicion: "MC",
-        pais: "🇪🇸",
-        linea: "mediocampistas",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "MC",
-        nombre: "Alberto",
-        posicion: "MC",
-        pais: "🇪🇸",
-        linea: "mediocampistas",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "DEL",
-        nombre: "Ricardo",
-        posicion: "DEL",
-        pais: "🇪🇸",
-        linea: "delanteros",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "DEL",
-        nombre: "Juan",
-        posicion: "DEL",
-        pais: "🇪🇸",
-        linea: "delanteros",
-        titular: true,
-        lesionado: false,
-        foto: "",
-    },
-    {
-        id: "DEL",
-        nombre: "Guille",
-        posicion: "DEL",
-        pais: "🇪🇸",
-        linea: "delanteros",
-        titular: false,
-        lesionado: false,
-        foto: "",
-    },
-]
-
 const managers = [{ nombre: "Gerardo Huizar Castro", pais: " 🇲🇽 México" }]
 
 const formaciones = {
@@ -151,8 +47,8 @@ let sidebarState = {
 }
 
 const avisos = [
-    { tipo: "⚠️", texto: "Los partidos comienzan en Enero" },
-    { tipo: "🏆", texto: "Sin miedo al éxito" },
+//     { tipo: "⚠️", texto: "Los partidos comienzan en Enero" },
+//     { tipo: "🏆", texto: "Sin miedo al éxito" },
 ]
 
 const proximosPartidos = []
@@ -521,20 +417,37 @@ function renderListaJugadores() {
 }
 
 function renderEstadisticas() {
-    const a = byId("avisosCards")
-    if (!a) return
+    // Renderizar avisos
+    const avisosContainer = byId("avisosCards")
+    if (avisosContainer) {
+        avisosContainer.innerHTML = ""
+        avisos.forEach((aviso) => {
+            const c = document.createElement("div")
+            c.className = "card"
+            c.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-size:1.5rem">${aviso.tipo}</span>
+                    <h4 style="margin:0">${aviso.texto}</h4>
+                </div>`
+            avisosContainer.appendChild(c)
+        })
+    }
 
-    a.innerHTML = ""
-    avisos.forEach((aviso) => {
-        const c = document.createElement("div")
-        c.className = "card"
-        c.innerHTML = `
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-size:1.5rem">${aviso.tipo}</span>
-                <h4 style="margin:0">${aviso.texto}</h4>
-            </div>`
-        a.appendChild(c)
-    })
+    // Actualizar estadísticas
+    const totalPartidos = partidos.length
+    const victorias = partidos.filter((p) => p.estado === "Victoria").length
+    const empates = partidos.filter((p) => p.estado === "Empate").length
+    const derrotas = partidos.filter((p) => p.estado === "Derrota").length
+
+    const totalPartidosEl = byId("totalPartidos")
+    const victoriasEl = byId("victorias")
+    const empatesEl = byId("empates")
+    const derrotasEl = byId("derrotas")
+
+    if (totalPartidosEl) totalPartidosEl.textContent = totalPartidos
+    if (victoriasEl) victoriasEl.textContent = victorias
+    if (empatesEl) empatesEl.textContent = empates
+    if (derrotasEl) derrotasEl.textContent = derrotas
 }
 
 function renderPartidos() {
@@ -652,76 +565,173 @@ function initTabs() {
 }
 
 // ====== Google Sheets Integration ======
-const GOOGLE_SHEET_ID = "1234567890abcdefghijklmnopqrstuvwxyz" // Reemplaza con tu ID real
+const GOOGLE_SHEET_ID = "1x6k5triAH_CNPgstQ5_NcyxMjMive1mNPGl4iPVCCUU"
 
 async function cargarDesdeGoogleSheets() {
-    // Si no hay ID configurado, usar datos locales
-    if (!GOOGLE_SHEET_ID || GOOGLE_SHEET_ID === "1234567890abcdefghijklmnopqrstuvwxyz") {
+    if (!GOOGLE_SHEET_ID) {
         console.log("[v0] Usando datos locales - configura GOOGLE_SHEET_ID para cargar desde Google Sheets")
         return
     }
 
     try {
-        const url = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=csv`
-        const response = await fetch(url)
+        console.log("[v0] Cargando datos desde Google Sheets...")
 
-        if (!response.ok) {
-            throw new Error("No se pudo cargar la hoja de cálculo")
-        }
+        // URLs para cada pestaña (usando gviz/tq para mejor compatibilidad)
+        const urlJugadores = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Jugadores`
+        const urlAvisos = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Avisos`
+        const urlProximos = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=ProximosPartidos`
+        const urlPartidos = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Partidos`
 
-        const csvText = await response.text()
-        const lineas = csvText.split("\n")
+        // Cargar todas las pestañas en paralelo
+        const [respJugadores, respAvisos, respProximos, respPartidos] = await Promise.all([
+            fetch(urlJugadores).catch(() => null),
+            fetch(urlAvisos).catch(() => null),
+            fetch(urlProximos).catch(() => null),
+            fetch(urlPartidos).catch(() => null),
+        ])
 
-        const headers = lineas[0].split(",").map((h) => h.trim().toLowerCase())
-        const nuevosJugadores = []
+        // ===== PROCESAR JUGADORES =====
+        if (respJugadores && respJugadores.ok) {
+            const csvJugadores = await respJugadores.text()
+            const lineasJugadores = csvJugadores.split("\n")
 
-        for (let i = 1; i < lineas.length; i++) {
-            if (!lineas[i].trim()) continue
+            // Limpiar comillas de los headers
+            const headers = lineasJugadores[0].split(",").map((h) => h.replace(/"/g, "").trim().toLowerCase())
+            const nuevosJugadores = []
 
-            const valores = lineas[i].split(",").map((v) => v.trim())
-            const jugador = {}
+            for (let i = 1; i < lineasJugadores.length; i++) {
+                if (!lineasJugadores[i].trim()) continue
 
-            headers.forEach((header, index) => {
-                jugador[header] = valores[index] || ""
-            })
+                // Parsear CSV correctamente (maneja comas dentro de comillas)
+                const valores = lineasJugadores[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || []
+                const valoresLimpios = valores.map((v) => v.replace(/^"|"$/g, "").trim())
 
-            let linea = ""
-            if (jugador.posicion === "POR") linea = "portero"
-            else if (jugador.posicion === "DEF") linea = "defensas"
-            else if (jugador.posicion === "MC") linea = "mediocampistas"
-            else if (jugador.posicion === "DEL") linea = "delanteros"
-
-            if (jugador.nombre && jugador.posicion && linea) {
-                nuevosJugadores.push({
-                    id: jugador.posicion,
-                    nombre: jugador.nombre,
-                    posicion: jugador.posicion,
-                    pais: jugador.pais || "🌍",
-                    linea: linea,
-                    titular: jugador.titular?.toUpperCase() === "TRUE",
-                    lesionado: jugador.lesionado?.toUpperCase() === "TRUE",
-                    foto: jugador.foto || "",
+                const jugador = {}
+                headers.forEach((header, index) => {
+                    jugador[header] = valoresLimpios[index] || ""
                 })
-            }
-        }
 
-        if (nuevosJugadores.length > 0) {
-            jugadores = nuevosJugadores
+                // Determinar línea según posición
+                let linea = ""
+                if (jugador.posicion === "POR") linea = "portero"
+                else if (jugador.posicion === "DEF") linea = "defensas"
+                else if (jugador.posicion === "MC") linea = "mediocampistas"
+                else if (jugador.posicion === "DEL") linea = "delanteros"
 
-            const titulares = jugadores.filter((j) => j.titular).length
-            if (titulares < 6) {
-                const noTitulares = jugadores.filter((j) => !j.titular && !j.lesionado)
-                for (let i = 0; i < 6 - titulares && i < noTitulares.length; i++) {
-                    noTitulares[i].titular = true
+                if (jugador.nombre && jugador.posicion && linea) {
+                    nuevosJugadores.push({
+                        id: jugador.posicion,
+                        nombre: jugador.nombre,
+                        posicion: jugador.posicion,
+                        pais: jugador.pais || "🌍",
+                        linea: linea,
+                        titular: jugador.titular?.toUpperCase() === "TRUE",
+                        lesionado: jugador.lesionado?.toUpperCase() === "TRUE",
+                        foto: jugador.foto || "",
+                    })
                 }
             }
 
-            render()
-            guardarAlineacion()
-            console.log(`[v0] Cargados ${nuevosJugadores.length} jugadores desde Google Sheets`)
+            if (nuevosJugadores.length > 0) {
+                jugadores = nuevosJugadores
+                console.log(`[v0] ✅ Cargados ${nuevosJugadores.length} jugadores`)
+
+                // Asegurar mínimo 6 titulares
+                const titulares = jugadores.filter((j) => j.titular).length
+                if (titulares < 6) {
+                    const noTitulares = jugadores.filter((j) => !j.titular && !j.lesionado)
+                    for (let i = 0; i < 6 - titulares && i < noTitulares.length; i++) {
+                        noTitulares[i].titular = true
+                    }
+                }
+            }
         }
+
+        // ===== PROCESAR AVISOS =====
+        if (respAvisos && respAvisos.ok) {
+            const csvAvisos = await respAvisos.text()
+            const lineasAvisos = csvAvisos.split("\n")
+            const headersAvisos = lineasAvisos[0].split(",").map((h) => h.replace(/"/g, "").trim().toLowerCase())
+
+            avisos.length = 0 // Limpiar avisos existentes
+
+            for (let i = 1; i < lineasAvisos.length; i++) {
+                if (!lineasAvisos[i].trim()) continue
+
+                const valores = lineasAvisos[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || []
+                const valoresLimpios = valores.map((v) => v.replace(/^"|"$/g, "").trim())
+
+                const tipoIndex = headersAvisos.indexOf("tipo")
+                const textoIndex = headersAvisos.indexOf("texto")
+
+                if (tipoIndex !== -1 && textoIndex !== -1) {
+                    avisos.push({
+                        tipo: valoresLimpios[tipoIndex] || "ℹ️",
+                        texto: valoresLimpios[textoIndex] || "",
+                    })
+                }
+            }
+            console.log(`[v0] ✅ Cargados ${avisos.length} avisos`)
+        }
+
+        // ===== PROCESAR PRÓXIMOS PARTIDOS =====
+        if (respProximos && respProximos.ok) {
+            const csvProximos = await respProximos.text()
+            const lineasProximos = csvProximos.split("\n")
+            const headersProximos = lineasProximos[0].split(",").map((h) => h.replace(/"/g, "").trim().toLowerCase())
+
+            proximosPartidos.length = 0
+
+            for (let i = 1; i < lineasProximos.length; i++) {
+                if (!lineasProximos[i].trim()) continue
+
+                const valores = lineasProximos[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || []
+                const valoresLimpios = valores.map((v) => v.replace(/^"|"$/g, "").trim())
+
+                proximosPartidos.push({
+                    fecha: valoresLimpios[headersProximos.indexOf("fecha")] || "",
+                    rival: valoresLimpios[headersProximos.indexOf("rival")] || "",
+                    competicion: valoresLimpios[headersProximos.indexOf("competicion")] || "",
+                    hora: valoresLimpios[headersProximos.indexOf("hora")] || "",
+                    lugar: valoresLimpios[headersProximos.indexOf("lugar")] || "Estadio",
+                })
+            }
+            console.log(`[v0] ✅ Cargados ${proximosPartidos.length} próximos partidos`)
+        }
+
+        // ===== PROCESAR HISTORIAL DE PARTIDOS =====
+        if (respPartidos && respPartidos.ok) {
+            const csvPartidos = await respPartidos.text()
+            const lineasPartidos = csvPartidos.split("\n")
+            const headersPartidos = lineasPartidos[0].split(",").map((h) => h.replace(/"/g, "").trim().toLowerCase())
+
+            partidos.length = 0
+
+            for (let i = 1; i < lineasPartidos.length; i++) {
+                if (!lineasPartidos[i].trim()) continue
+
+                const valores = lineasPartidos[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || []
+                const valoresLimpios = valores.map((v) => v.replace(/^"|"$/g, "").trim())
+
+                partidos.push({
+                    fecha: valoresLimpios[headersPartidos.indexOf("fecha")] || "",
+                    rival: valoresLimpios[headersPartidos.indexOf("rival")] || "",
+                    resultado: valoresLimpios[headersPartidos.indexOf("resultado")] || "",
+                    estado: valoresLimpios[headersPartidos.indexOf("estado")] || "",
+                    detalles: valoresLimpios[headersPartidos.indexOf("detalles")] || "",
+                })
+            }
+            console.log(`[v0] ✅ Cargados ${partidos.length} partidos en historial`)
+        }
+
+        // Renderizar todo
+        render()
+        guardarAlineacion()
+
+        console.log("[v0] 🎉 Todos los datos cargados correctamente desde Google Sheets")
     } catch (error) {
-        console.error("[v0] Error al cargar Google Sheets:", error)
+        console.error("[v0] ❌ Error al cargar Google Sheets:", error)
+        alert("⚠️ Error al cargar datos desde Google Sheets. Usando datos locales.")
     }
 }
 
